@@ -14,6 +14,7 @@
 
 <script>
 import KanbanTable from "./components/KanbanTable.vue";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
   name: "App",
@@ -31,5 +32,23 @@ export default {
 <style>
 .v-application {
   background-color: #273240;
+}
+
+.dp-custom-input {
+  background-color: transparent;
+  border: none;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  padding-left: 0px;
+  color: #3c475a;
+}
+.dp__icon {
+  display: none;
+}
+
+.task-datepicker {
+  background-color: #b9d0f5;
+  border-bottom: 1px solid #8496b3;
+  color: #3c475a;
 }
 </style>

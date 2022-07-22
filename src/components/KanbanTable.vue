@@ -58,30 +58,10 @@
         </draggable>
       </v-col>
     </div>
-    <v-dialog v-model="dialog" width="500">
-      <v-card class="add-task-card px-5 py-5">
-        <v-card-title class="text-h5 grey lighten-2">
-          Remove Task
-        </v-card-title>
-
-        <v-card-text> Are you sure you want to remove the task? </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="toggleModal"> Cancel </v-btn>
-          <v-btn
-            color="danger"
-            text
-            @click="
-              () => {
-                removeTask(element);
-              }
-            "
-          >
-            Remove
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <remove-task-modal
+      ref="removeTaskModal"
+      :selectedTask="selectedTask"
+    ></remove-task-modal>
   </v-container>
 </template>
 
@@ -89,6 +69,7 @@
 import BadgeColumn from "./BadgeColumn.vue";
 import TaskCard from "./TaskCard.vue";
 import AddTaskModal from "./AddTaskModal.vue";
+import RemoveTaskModal from "./RemoveTaskModal.vue";
 import draggable from "vuedraggable";
 import ProgressBar from "./ProgressBar";
 import { computed } from "vue";
@@ -102,12 +83,13 @@ export default {
     TaskCard,
     draggable,
     ProgressBar,
+    RemoveTaskModal,
     AddTaskModal,
   },
   setup() {
     const store = useStore();
     let addTaskModal = ref();
-    let dialog = ref(false);
+    let removeTaskModal = ref();
     let view = ref(false);
     let selectedTask = ref({});
     let selectedStage = ref("");
@@ -116,21 +98,15 @@ export default {
       return store.state.columns;
     });
 
-    const removeTask = () => {
-      store.commit("removeTask", selectedTask.value);
-      toggleModal();
-    };
-
     const toggleModal = (task) => {
       selectedTask.value = task;
-      dialog.value = !dialog.value;
+      removeTaskModal.value.dialog = !removeTaskModal.value.dialog;
     };
 
     return {
       columns,
-      dialog,
       addTaskModal,
-      removeTask,
+      removeTaskModal,
       toggleModal,
       view,
       selectedTask,

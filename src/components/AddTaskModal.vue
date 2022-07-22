@@ -60,8 +60,11 @@
               <v-field-label>Deadline</v-field-label>
             </v-col>
             <v-col v-if="!view" cols="12" sm="4">
-              <datepicker
+              <Datepicker
+                :clearable="false"
+                :format="format"
                 :disabled="view"
+                inputClassName="dp-custom-input"
                 class="w-100 px-5 py-4 task-datepicker"
                 v-model="form.date"
               />
@@ -143,7 +146,7 @@
   </v-dialog>
 </template>
 <script>
-import Datepicker from "vue3-datepicker";
+import Datepicker from "@vuepic/vue-datepicker";
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 
@@ -179,6 +182,14 @@ export default {
     let columns = computed(function () {
       return store.state.columns;
     });
+
+    const format = (date) => {
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    };
 
     const toggleModal = () => {
       dialog.value = !dialog.value;
@@ -239,6 +250,7 @@ export default {
       getUrl,
       comment,
       errors,
+      format,
     };
   },
 };
@@ -247,11 +259,5 @@ export default {
 .add-task-card {
   background-color: #c2d8ff;
   color: #273240;
-}
-
-.task-datepicker {
-  background-color: #b9d0f5;
-  border-bottom: 1px solid #8496b3;
-  color: #3c475a;
 }
 </style>
