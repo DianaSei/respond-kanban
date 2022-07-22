@@ -1,10 +1,10 @@
 <template>
   <v-container class="mt-5">
-    <progress-bar :columns="columns"></progress-bar>
+    <progress-bar :columns="filteredColumns"></progress-bar>
     <v-row class="justify-end mt-8">
       <v-btn
         color="#448AFF"
-        class="text-white"
+        class="text-white mr-3"
         @click="
           () => {
             view = false;
@@ -14,6 +14,14 @@
       >
         Add Task
       </v-btn>
+      <v-btn color="#448AFF" class="text-white" @click="toggleFilterModal">
+        Search &amp; filter
+      </v-btn>
+      <filter-modal
+        ref="filterModal"
+        :applyFilter="(form) => applyFilter(form)"
+      ></filter-modal>
+
       <add-task-modal
         ref="addTaskModal"
         :view="view"
@@ -23,7 +31,7 @@
     </v-row>
     <div class="columns-wrapper d-flex mt-10">
       <v-col
-        v-for="(column, index) in columns"
+        v-for="(column, index) in filteredColumns"
         :key="index"
         cols="4"
         class="mx-2 rounded-lg px-6 py-3 task-column"
@@ -70,17 +78,20 @@ import BadgeColumn from "./BadgeColumn.vue";
 import TaskCard from "./TaskCard.vue";
 import AddTaskModal from "./AddTaskModal.vue";
 import RemoveTaskModal from "./RemoveTaskModal.vue";
+import FilterModal from "./FilterModal.vue";
 import draggable from "vuedraggable";
 import ProgressBar from "./ProgressBar";
 import { computed } from "vue";
 import { useStore } from "vuex";
 import { ref } from "vue";
+import { checkFilter } from "../utils";
 
 export default {
   name: "KanbanTable",
   components: {
     BadgeColumn,
     TaskCard,
+    FilterModal,
     draggable,
     ProgressBar,
     RemoveTaskModal,
@@ -91,16 +102,32 @@ export default {
     let addTaskModal = ref();
     let removeTaskModal = ref();
     let view = ref(false);
+    let filterModal = ref();
     let selectedTask = ref({});
     let selectedStage = ref("");
-
+    let filter = ref(null);
     let columns = computed(function () {
       return store.state.columns;
     });
 
+    const filteredColumns = computed(function () {
+      if (filter.value) {
+        return checkFilter(columns.value, filter.value);
+      } else {
+        return columns.value;
+      }
+    });
+
+    const applyFilter = (filters) => {
+      filter.value = { ...filters };
+    };
     const toggleModal = (task) => {
       selectedTask.value = task;
       removeTaskModal.value.dialog = !removeTaskModal.value.dialog;
+    };
+
+    const toggleFilterModal = () => {
+      filterModal.value.dialog = !filterModal.value.dialog;
     };
 
     return {
@@ -109,8 +136,13 @@ export default {
       removeTaskModal,
       toggleModal,
       view,
+      filterModal,
       selectedTask,
       selectedStage,
+      toggleFilterModal,
+      applyFilter,
+      filter,
+      filteredColumns,
     };
   },
 };
