@@ -8,6 +8,15 @@
         <v-container>
           <v-row>
             <v-col cols="12">
+              <div v-if="errors.title?.length > 0">
+                <p
+                  class="text-red"
+                  v-for="(error, index) in errors.title"
+                  :key="index"
+                >
+                  {{ error }}
+                </p>
+              </div>
               <div v-if="view">
                 <b><span>Title</span></b>
                 <p>{{ task.title }}</p>
@@ -15,10 +24,20 @@
               <v-text-field
                 v-else
                 v-model="form.title"
+                required
                 label="Title"
               ></v-text-field>
             </v-col>
             <v-col cols="12">
+              <div v-if="errors.description?.length > 0">
+                <p
+                  class="text-red"
+                  v-for="(error, index) in errors.description"
+                  :key="index"
+                >
+                  {{ error }}
+                </p>
+              </div>
               <div v-if="view">
                 <b><span>Description</span></b>
                 <p>{{ task.description }}</p>
@@ -26,6 +45,7 @@
               <v-textarea
                 v-else
                 :disabled="view"
+                required
                 v-model="form.description"
                 label="Description"
               ></v-textarea>
@@ -146,6 +166,7 @@ export default {
     const store = useStore();
     let dialog = ref(false);
     let comment = ref("");
+    let errors = ref({});
     let form = ref({
       title: "",
       description: "",
@@ -167,6 +188,21 @@ export default {
       return URL.createObjectURL(file);
     };
 
+    const validateForm = () => {
+      let error = {};
+      let valid = true;
+      if (form.value.title === "") {
+        error["title"] = ["Please provide the title"];
+        valid = false;
+      }
+      if (form.value.description === "") {
+        error["description"] = ["Please provide the description"];
+        valid = false;
+      }
+      errors.value = error;
+      return valid;
+    };
+
     const addTask = () => {
       if (props.view) {
         let data = {
@@ -177,18 +213,21 @@ export default {
         store.commit("updateTask", data);
         comment.value = "";
         form.value.files = [];
+        toggleModal();
       } else {
-        store.commit("addTask", form.value);
-        form.value = {
-          title: "",
-          description: "",
-          date: new Date(),
-          tags: "",
-          stage: "",
-          files: [],
-        };
+        if (validateForm()) {
+          store.commit("addTask", form.value);
+          form.value = {
+            title: "",
+            description: "",
+            date: new Date(),
+            tags: "",
+            stage: "",
+            files: [],
+          };
+          toggleModal();
+        }
       }
-      toggleModal();
     };
 
     return {
@@ -199,6 +238,7 @@ export default {
       toggleModal,
       getUrl,
       comment,
+      errors,
     };
   },
 };
