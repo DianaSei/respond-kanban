@@ -24,6 +24,9 @@
                 label="Tags"
               ></v-select>
             </v-col>
+            <v-col cols="12" sm="12">
+              <v-text-field v-model="form.search" label="Search"></v-text-field>
+            </v-col>
           </v-row>
         </v-container>
       </v-card-text>
@@ -64,6 +67,7 @@ export default {
     let form = ref({
       date: [],
       tags: "",
+      search: "",
     });
 
     const format = (date) => {
