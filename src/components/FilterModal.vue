@@ -15,6 +15,7 @@
                 class="w-100 px-5 py-4 task-datepicker"
                 v-model="form.date"
                 :clearable="true"
+                placeholder="Select dates range"
               />
             </v-col>
             <v-col cols="12" sm="12">
